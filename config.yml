@@ -1,0 +1,10 @@
+# -----------------------------------
+# --- SignRegionWorldguard Config ---
+# -----------------------------------
+parent: cubicraft
+nbr_terrain_max:
+  vagabon: 1
+  visiteur: 2
+  membre: 3
+  resident: 5
+prix: 1000
