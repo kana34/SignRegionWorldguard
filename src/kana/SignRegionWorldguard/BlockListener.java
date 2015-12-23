@@ -37,29 +37,34 @@ public class BlockListener implements Listener {
 	
 	@org.bukkit.event.EventHandler(priority=EventPriority.NORMAL)
 	public void onSignChange(SignChangeEvent event){
-		
 		this.sign = (Sign) event.getBlock().getState();
 		this.lines = event.getLines();
-		this.player = event.getPlayer();
-		this.prix = this.plugin.getConfig().getString("prix");
-		this.world = event.getBlock().getWorld();
 		
+		// On vérifie si il y a inscrit le nom du plugin
+		//----------------------------------------------
         if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
-        	
-        	// On vérifie si le joueur à la permission de créer un panneau selon la ville
+
+    		this.player = event.getPlayer();
+    		this.prix = this.plugin.getConfig().getString("prix");
+    		this.world = event.getBlock().getWorld();
+    		
+        	// On vérifie si le joueur à la permission de créer un panneau
+    		//------------------------------------------------------------
         	if(!Vault.permission.playerHas(player,"signregionworldguard.create")){
         		player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Vous n'avez pas la permission pour créer ce panneau !");
         		event.setCancelled(true);
         		return;
         	}
         	
+        	// On vérifie si le panneau se trouve sur 2 régions ou sur aucune
+        	//---------------------------------------------------------------
         	this.parent = this.plugin.getConfig().getString("parent");
         	this.position = new Vector(sign.getLocation().getBlockX(), sign.getLocation().getBlockY(), sign.getLocation().getBlockZ());
     		this.worldGuard = this.plugin.getWorldGuard();
     		this.regionManager = worldGuard.getRegionManager(world);
     		this.listRegion = regionManager.getApplicableRegionsIDs(position);
     		listRegion.remove(parent);
-    		
+    		    	
     		if(listRegion.size() > 1){
     			player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Le panneau se trouve sur 2 régions !");
     			event.setCancelled(true);
@@ -70,34 +75,39 @@ public class BlockListener implements Listener {
     			event.setCancelled(true);
         		return;
     		}
-    		else{
-    			
+    		// On formate le panneau
+    		//----------------------
+    		else{    			
     			event.setLine(1, listRegion.get(0));
-	    			if(lines[2].toString().isEmpty()){
-	        			event.setLine(2, prix);
-	        		}
-	        		if(lines[3].toString().isEmpty()){
-	        			event.setLine(3, "cubicraft");
-	        		}
-	        		event.getBlock().getState().update();
-	        		player.sendMessage(ChatColor.GREEN + "[SignRegionWorldguard] " + ChatColor.WHITE + "Panneau créé avec succés !");
-	        		return;
+    			if(lines[2].toString().isEmpty()){
+        			event.setLine(2, prix);
+        		}
+        		if(lines[3].toString().isEmpty()){
+        			event.setLine(3, "cubicraft");
+        		}
+        		event.getBlock().getState().update();
+        		player.sendMessage(ChatColor.GREEN + "[SignRegionWorldguard] " + ChatColor.WHITE + "Panneau créé avec succés !");
+        		return;
     		}
         }
 	}
 	
 	@org.bukkit.event.EventHandler(priority=EventPriority.NORMAL)
 	public void onBlockBreak(BlockBreakEvent event){
-		
-		this.player = event.getPlayer();
-		this.bloc = event.getBlock();
-		
-		
-		if (bloc != null && bloc.getState() instanceof Sign){ 		    			
-			this.sign = (Sign) event.getBlock().getState();
-			this.lines = sign.getLines();
-			
+		this.bloc = event.getBlock();			
+		this.sign = (Sign) event.getBlock().getState();
+		this.lines = sign.getLines();
+		// On vérifie si c'est un panneau
+		//-------------------------------
+		if (bloc != null && bloc.getState() instanceof Sign){
+			// On vérifie si il y a inscrit le nom du plugin
+			//----------------------------------------------
 			if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
+				
+				this.player = event.getPlayer();				
+				
+				// On vérifie la permission
+				//-------------------------
 	    		if(!Vault.permission.playerHas(player,"signregionworldguard.create")){
 	    			event.setCancelled(true);
 	    			player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Vous n'avez pas la permission pour détruire ce panneau !");

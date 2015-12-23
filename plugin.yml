@@ -3,7 +3,7 @@ main: kana.SignRegionWorldguard.SignRegionWorldguard
 author: kana34
 website: http://www.2k16.ovh
 description: Permet d acheter des terrains worldguard
-version: 1.0
+version: 1.1
 depends: [Vault, WorldGuard, WorldEdit]
 commands:
     srw:

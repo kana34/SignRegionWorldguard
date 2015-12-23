@@ -47,34 +47,41 @@ public class PlayerListener implements Listener{
 	
 	@org.bukkit.event.EventHandler(priority=EventPriority.NORMAL)      
     public void onPlayerInteract(PlayerInteractEvent e) throws StorageException{
-	    
-		if(e.getAction() == Action .RIGHT_CLICK_BLOCK){
-            
+	    // On vérifie clic droit
+		//----------------------
+		if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
+            // On vérifie si c'est un panneau
+			//-------------------------------
 			if(e.getClickedBlock().getState() instanceof Sign){
-				
 				this.sign = (Sign)e.getClickedBlock().getState();
-				this.world = sign.getWorld();
 				this.lines = sign.getLines();
-				this.player = e.getPlayer();
-				this.groupe = Vault.permission.getPrimaryGroup(player);
-				this.prix = lines[2];
 				
+				// On vérifie si il y a inscrit le nom du plugin
+				//----------------------------------------------
 				if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
 					
+					this.world = sign.getWorld();					
+					this.player = e.getPlayer();
+					this.groupe = Vault.permission.getPrimaryGroup(player);
+					this.prix = lines[2];
+					
 					// Vérification de la permission pour utiliser le panneau
+					//-------------------------------------------------------
 					if(!Vault.permission.playerHas(player,"signregionworldguard.use")){
 						player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Vous n'avez pas la permission d'utiliser ce panneau!");
 						return;
 					}
 					
-					// Vérification que le joueur ai assez d'argent pour la transaction
+					// Vérification que le joueur a assez d'argent pour la transaction
+					//-----------------------------------------------------------------
 					this.verifArgent = Vault.economy.bankHas(player.getName(), Double.parseDouble(prix));
 	        		if(!verifArgent.transactionSuccess()){
 	        			player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Vous n'avez pas assez d'argent pour acheter ce terrain !");
 	        			return;
 	        		}
 					
-	        		// vérification du nombre de terrain du joueur
+	        		// Vérification du nombre de terrain du joueur
+	        		//--------------------------------------------
 					this.nbrLimitTerrain = this.plugin.getConfig().getInt("nbr_terrain_max." + groupe);
 					this.worldGuard = this.plugin.getWorldGuard();
 	    			this.localplayer = worldGuard.wrapPlayer(player);
@@ -85,6 +92,7 @@ public class PlayerListener implements Listener{
 	    			}
 
 					// On ajoute le joueur sur le terrain
+	    			//-----------------------------------
 					this.nomTerrain = sign.getLine(1);
 					this.regionManager = worldGuard.getRegionManager(world);
 					this.region = regionManager.getRegion(nomTerrain);
@@ -94,10 +102,12 @@ public class PlayerListener implements Listener{
 			    	region.setOwners(owner);
 			    	
 			    	// On retire l'argent du joueur
+		    		//-----------------------------
 			    	this.achat = Vault.economy.bankWithdraw(player.getName(), Double.parseDouble(prix));
 			    	if(achat.transactionSuccess()){
 			    		
 			    		// On dépose l'argent sur le compte du proprio du terrain
+			    		//-------------------------------------------------------
 			    		this.depot = Vault.economy.bankDeposit(lines[3].toString(), Double.parseDouble(prix));
 			    		if(!depot.transactionSuccess()){
 			    			player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Un problème est survenu lors de l'achat, contactez un Admin !");
@@ -111,18 +121,38 @@ public class PlayerListener implements Listener{
 			    		}
 			    		
 			    		// On sauvegarde Worldguard
-							regionManager.save();
-							// On supprime le panneau
-							sign.getBlock().setType(Material.AIR);
-							// On téléporte le joueur sur son terrain et envoie un message
-							player.teleport(sign.getLocation());
-							player.sendMessage(ChatColor.GREEN + "[SignRegionWorldguard] " + ChatColor.WHITE + "Région " + ChatColor.BLUE + region.getId().toString() + ChatColor.WHITE + " acheté avec succés !");
-							return;			    		
+			    		//-------------------------
+						regionManager.save();
+						
+						// On supprime le panneau
+						//-----------------------
+						sign.getBlock().setType(Material.AIR);
+						
+						// On téléporte le joueur sur son terrain et envoie un message
+						//------------------------------------------------------------
+						player.teleport(sign.getLocation());
+						player.sendMessage(ChatColor.GREEN + "[SignRegionWorldguard] " + ChatColor.WHITE + "Région " + ChatColor.BLUE + region.getId().toString() + ChatColor.WHITE + " acheté avec succés !");
+						return;			    		
 			    	}
 			    	else{
 			    		player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Un problème est survenu lors de l'achat, contactez un Admin !");
 			    		return;
 			    	}
+				}
+			}
+		}
+		else if(e.getAction() == Action.LEFT_CLICK_BLOCK){
+			// On vérifie si c'est un panneau
+			//-------------------------------
+			if(e.getClickedBlock().getState() instanceof Sign){
+				this.sign = (Sign)e.getClickedBlock().getState();
+				this.lines = sign.getLines();
+				this.player = e.getPlayer();
+				
+				// On vérifie si il y a inscrit le nom du plugin
+				//----------------------------------------------
+				if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
+					player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Acheter cette parcelle avec clic droit pour " + lines[2] + " " + Vault.economy.currencyNamePlural());
 				}
 			}
 		}
