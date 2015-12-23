@@ -95,11 +95,12 @@ public class BlockListener implements Listener {
 	@org.bukkit.event.EventHandler(priority=EventPriority.NORMAL)
 	public void onBlockBreak(BlockBreakEvent event){
 		this.bloc = event.getBlock();			
-		this.sign = (Sign) event.getBlock().getState();
-		this.lines = sign.getLines();
+		
 		// On vérifie si c'est un panneau
 		//-------------------------------
 		if (bloc != null && bloc.getState() instanceof Sign){
+			this.sign = (Sign) event.getBlock().getState();
+			this.lines = sign.getLines();
 			// On vérifie si il y a inscrit le nom du plugin
 			//----------------------------------------------
 			if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
