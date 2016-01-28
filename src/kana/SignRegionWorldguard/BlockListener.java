@@ -22,6 +22,7 @@ public class BlockListener implements Listener {
 	private Sign sign;
 	private Player player;
 	private String prix;
+	private Double prix_bloc;
 	private Block bloc;
 	private WorldGuardPlugin worldGuard;
 	private World world;
@@ -44,9 +45,8 @@ public class BlockListener implements Listener {
 		//----------------------------------------------
         if(lines[0].equalsIgnoreCase("[SRW]") || lines[0].equalsIgnoreCase("[SignRegionWorldguard]")){
 
-    		this.player = event.getPlayer();
-    		this.prix = this.plugin.getConfig().getString("prix");
-    		this.world = event.getBlock().getWorld();
+    		this.player = event.getPlayer();   		
+    		this.world = event.getBlock().getWorld();   		    		
     		
         	// On vérifie si le joueur à la permission de créer un panneau
     		//------------------------------------------------------------
@@ -74,10 +74,20 @@ public class BlockListener implements Listener {
     			player.sendMessage(ChatColor.RED + "[SignRegionWorldguard] " + ChatColor.WHITE + "Aucune region ne ce trouve ici !");
     			event.setCancelled(true);
         		return;
-    		}
-    		// On formate le panneau
-    		//----------------------
+    		}    	   		
     		else{    			
+    			// On vérifie si on fixe le prix par bloc ou non
+        		//----------------------------------------------
+        		if(this.plugin.getConfig().getBoolean("prix_par_bloc") == true){
+        			this.prix_bloc = this.plugin.getConfig().getDouble("prix_bloc");
+        			this.prix = Double.toString(regionManager.getRegion(listRegion.get(0)).volume() * prix_bloc);
+        		}
+        		else{
+        			this.prix = this.plugin.getConfig().getString("prix");
+        		}
+        		
+        		// On formate le panneau
+        		//----------------------
     			event.setLine(1, listRegion.get(0));
     			if(lines[2].toString().isEmpty()){
         			event.setLine(2, prix);

@@ -7,4 +7,6 @@ nbr_terrain_max:
   visiteur: 2
   membre: 3
   resident: 5
+prix_par_bloc: true
+prix_bloc: 0.15
 prix: 1000
